@@ -27,7 +27,7 @@ app.get('/', (req,res) => {
   res.send("Welcome to Node JWT Authentication App!");
 })
 
-const userRouter = require('./routes/users.js');
+const userRouter = require('./routes/users');
 app.use('/auth', userRouter);
 
 app.listen(port, () => {

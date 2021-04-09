@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Users = require('../models/users_model.js');
+const Users = require('../models/users_model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const verify = require('../tokens/loginToken');
 
-router.get('/', async(req,res) => {
+router.get('/', verify, async(req,res) => {
   Users.find()
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error: "+err));
@@ -48,5 +49,11 @@ router.post('/login', async(req,res) => {
   res.header("login-token", token).json("Login Successful!");
   
 })
+
+router.delete("/:id", (req, res) => {
+  Users.findByIdAndDelete(req.params.id)
+    .then(() => res.json("User Account Deleted"))
+    .catch((err) => res.status(400).json("Error: " + err));
+});
 
 module.exports = router;
