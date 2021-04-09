@@ -29,6 +29,24 @@ router.post('/register', async(req,res) => {
     .catch((err) => res.status(400).json('Error'+ err));
 })
 
-
+router.post('/login', async(req,res) => {
+  const user = await Users.findOne({ email: req.body.email });
+  
+  if(!user) return res.status(400).json("Account not present");
+  
+  const auth = await bcrypt.compare(req.body.password, user.password);
+  
+  if(!auth) return res.status(400).json("Wrong Password");
+  
+  const sessionDetails = {
+    id: user._id,
+    name: user.name
+  }
+  
+  const token = jwt.sign(sessionDetails, process.env.SECRET_KEY);
+  
+  res.header("login-token", token).json("Login Successful!");
+  
+})
 
 module.exports = router;
