@@ -5,6 +5,9 @@ const router = express.Router();
 // Importing User model
 const Users = require('../models/users_model');
 
+// Importing BlackList Model
+const Blacklist = require('../models/blacklist_model'); 
+
 // Importing Encryption Modules
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -67,11 +70,21 @@ router.post('/login', async(req,res) => {
   }
   
   //Creating a jwt token to store the session details
-  const token = jwt.sign(sessionDetails, process.env.SECRET_KEY);
+  const token = jwt.sign(sessionDetails, process.env.SECRET_KEY, { expiresIn: '30m' });
   
   //Sending the token to the client side
   res.header("login-token", token).json("Login Successful!");
   
+})
+
+// Route for user to logout
+router.post('/logout', async(req, res) => {
+  const newToken = new Blacklist({
+    token: req.body.token
+  })
+  newToken.save()
+    .then(() => res.json("Logout Successful!"))
+    .catch((err) => res.status(400).json("Error: "+err));
 })
 
 // Route to delete an user account
